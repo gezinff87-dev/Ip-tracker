@@ -5,6 +5,7 @@ import os
 import time
 import platform
 import webbrowser
+from urllib.parse import urlparse
 
 # CORES
 RED = "\033[91m"
@@ -44,22 +45,29 @@ def banner():
              ☢︎ Powered by Suprateam  
 {RESET}""")
 
+# ===================== URL UNIVERSAL =====================
 def clean_input(user_input):
     user_input = user_input.strip()
-    user_input = user_input.replace("http://", "")
-    user_input = user_input.replace("https://", "")
-    user_input = user_input.replace("www.", "")
-    user_input = user_input.split("/")[0]
-    return user_input
-
-def is_ip(ip):
-    return re.match(r"^\d{1,3}(\.\d{1,3}){3}$", ip)
+    if not user_input.startswith(("http://", "https://")):
+        user_input = "http://" + user_input
+    parsed = urlparse(user_input)
+    return parsed.hostname  # retorna apenas o domínio
 
 def resolve_domain(domain):
     try:
-        return socket.gethostbyname(domain)
-    except:
+        if domain:
+            return socket.gethostbyname(domain)
         return None
+    except:
+        try:
+            res = requests.get(f"http://{domain}", timeout=5)
+            return socket.gethostbyname(domain)
+        except:
+            return None
+
+# ===================== IP =====================
+def is_ip(ip):
+    return re.match(r"^\d{1,3}(\.\d{1,3}){3}$", ip)
 
 def get_ip_info(ip):
     try:
@@ -106,18 +114,16 @@ def show_result(ip, data):
     else:
         print(RED + "[!] Sem localização" + RESET)
 
-# FUNÇÃO UNIVERSAL PARA ABRIR URL (Termux, WSL, Windows, Linux, macOS)
+# ===================== FUNÇÃO UNIVERSAL ABRIR LINK =====================
 def open_url(url):
     try:
         sistema = platform.system()
         release = platform.release().lower()
 
-        # Detecta WSL
         if sistema == "Linux" and "microsoft" in release:
-            os.system(f'explorer.exe "{url}"')
-        # Detecta Termux
+            os.system(f'explorer.exe "{url}"')  # WSL
         elif "ANDROID_ROOT" in os.environ:
-            os.system(f'termux-open-url "{url}"')
+            os.system(f'termux-open-url "{url}"')  # Termux
         elif sistema == "Linux":
             os.system(f'xdg-open "{url}"')
         elif sistema == "Windows":
@@ -131,6 +137,7 @@ def open_url(url):
     except Exception as e:
         print(RED + f"\n[!] Falha ao abrir link: {e}" + RESET)
 
+# ===================== VPN =====================
 def open_vpn():
     global ip_antes
 
@@ -159,12 +166,12 @@ def check_vpn():
     show_result(ip_depois, data)
 
     print(YELLOW + "\n[~] Comparação:" + RESET)
-
     if ip_depois != ip_antes:
         print(GREEN + f"[✔] IP mudou: {ip_antes} → {ip_depois}" + RESET)
     else:
         print(RED + "[✘] IP NÃO mudou (VPN pode não estar ativa)" + RESET)
 
+# ===================== MENU =====================
 def main():
     while True:
         clear()
@@ -182,11 +189,11 @@ def main():
 
         if choice == "1":
             user_input = input(CYAN + "\nDigite a URL: " + RESET)
-            user_input = clean_input(user_input)
+            domain = clean_input(user_input)
 
-            ip = resolve_domain(user_input)
+            ip = resolve_domain(domain)
             if not ip:
-                print(RED + "\n[!] URL inválida." + RESET)
+                print(RED + "\n[!] URL inválida ou não resolvível." + RESET)
                 input("\nEnter...")
                 continue
 
@@ -225,7 +232,6 @@ def main():
 
         elif choice == "6":
             confirm = input(YELLOW + "\nTem certeza que deseja sair? (s/n): " + RESET).lower()
-
             if confirm == "s":
                 print(YELLOW + "\n[~] Finalizando..." + RESET)
                 time.sleep(0.5)
