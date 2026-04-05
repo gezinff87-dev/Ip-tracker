@@ -51,7 +51,7 @@ def clean_input(user_input):
     if not user_input.startswith(("http://", "https://")):
         user_input = "http://" + user_input
     parsed = urlparse(user_input)
-    return parsed.hostname  # retorna apenas o domínio
+    return parsed.hostname
 
 def resolve_domain(domain):
     try:
@@ -60,8 +60,11 @@ def resolve_domain(domain):
         return None
     except:
         try:
-            res = requests.get(f"http://{domain}", timeout=5)
-            return socket.gethostbyname(domain)
+            # Fallback: faz requisição HTTP para extrair IP do servidor
+            res = requests.get(f"http://{domain}", timeout=5, stream=True)
+            sock = res.raw._connection.sock
+            ip = sock.getpeername()[0]
+            return ip
         except:
             return None
 
