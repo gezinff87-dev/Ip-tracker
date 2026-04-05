@@ -11,9 +11,8 @@ Este projeto foi desenvolvido para funcionar em **Termux, Linux, macOS e Windows
 ✔️ Consultar domínio / URL e ver IP  
 ✔️ Consultar IP específico  
 ✔️ Exibir seu IP público + IP local  
-✔️ Abrir link para instalar Proton VPN  
-✔️ Verificar se o IP mudou após ativar VPN  
-✔️ Mini “emoji hacker” em ASCII no topo do menu  
+✔️ VPN FREE para instalar
+✔️ Verificar se o IP mudou após ativar VPN    
 
 ---
 
