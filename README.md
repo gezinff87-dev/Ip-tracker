@@ -1,6 +1,6 @@
-# IP Analyzer 🔎
+# IP Tracker 🥷
 
-Ferramenta simples para analisar IPs e domínios direto no Termux ou PC.
+Ferramenta avançada para analisar IPs e domínios direto no Terminal ou PC.
 
 ## 📦 Instalação (Termux)
 
