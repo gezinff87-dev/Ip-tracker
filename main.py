@@ -18,12 +18,13 @@ def clear():
 def banner():
     clear()
     print(f"""{GREEN}
-██╗██████╗     █████╗ ███╗   ██╗ █████╗ ██╗     ██╗   ██╗███████╗██████╗ 
-██║██╔══██╗   ██╔══██╗████╗  ██║██╔══██╗██║     ╚██╗ ██╔╝██╔════╝██╔══██╗
-██║██████╔╝   ███████║██╔██╗ ██║███████║██║      ╚████╔╝ █████╗  ██████╔╝
-██║██╔═══╝    ██╔══██║██║╚██╗██║██╔══██║██║       ╚██╔╝  ██╔══╝  ██╔══██╗
-██║██║        ██║  ██║██║ ╚████║██║  ██║███████╗   ██║   ███████╗██║  ██║
-╚═╝╚═╝        ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
+██╗██████╗     ████████╗██████╗  █████╗  ██████╗██╗  ██╗███████╗██████╗ 
+██║██╔══██╗    ╚══██╔══╝██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+██║██████╔╝       ██║   ██████╔╝███████║██║     █████╔╝ █████╗  ██████╔╝
+██║██╔═══╝        ██║   ██╔══██╗██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+██║██║            ██║   ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
+╚═╝╚═╝            ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+             🕵️  IP TRACKER  🕵️
 {RESET}""")
 
 def clean_input(user_input):
@@ -50,6 +51,24 @@ def get_ip_info(ip):
     except:
         return None
 
+def get_my_ip():
+    try:
+        res = requests.get("https://ipinfo.io/json", timeout=5)
+        data = res.json()
+        return data.get("ip"), data
+    except:
+        return None, None
+
+def get_local_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return None
+
 def loading():
     print(YELLOW + "\n[~] Coletando dados..." + RESET)
     time.sleep(1)
@@ -66,36 +85,63 @@ def show_result(ip, data):
         lat, lon = loc.split(",")
         maps_link = f"https://www.google.com/maps?q={lat},{lon}"
         print(YELLOW + f"\n[+] Localização aproximada: {lat}, {lon}" + RESET)
-        print(GREEN + f"[+] Abrir no mapa: {maps_link}" + RESET)
+        print(GREEN + f"[+] Mapa: {maps_link}" + RESET)
     else:
         print(RED + "[!] Localização não disponível" + RESET)
 
 def main():
     banner()
 
-    if len(sys.argv) > 1:
-        user_input = sys.argv[1]
-    else:
-        user_input = input(CYAN + "Digite IP ou domínio: " + RESET)
+    print(CYAN + "[1] Consultar IP / Domínio")
+    print("[2] Meu IP público")
+    print("[3] Meu IP local\n" + RESET)
 
-    user_input = clean_input(user_input)
+    choice = input("Escolha: ")
 
-    if is_ip(user_input):
-        ip = user_input
-    else:
-        ip = resolve_domain(user_input)
-        if not ip:
-            print(RED + "\n[!] Domínio inválido ou não resolvido." + RESET)
+    if choice == "1":
+        user_input = input(CYAN + "\nDigite IP ou domínio: " + RESET)
+        user_input = clean_input(user_input)
+
+        if is_ip(user_input):
+            ip = user_input
+        else:
+            ip = resolve_domain(user_input)
+            if not ip:
+                print(RED + "\n[!] Domínio inválido." + RESET)
+                return
+
+        loading()
+        data = get_ip_info(ip)
+
+        if not data:
+            print(RED + "[!] Erro na API." + RESET)
             return
 
-    loading()
+        show_result(ip, data)
 
-    data = get_ip_info(ip)
-    if not data:
-        print(RED + "[!] Erro ao consultar API." + RESET)
-        return
+    elif choice == "2":
+        loading()
+        ip, data = get_my_ip()
 
-    show_result(ip, data)
+        if not ip:
+            print(RED + "[!] Não foi possível obter IP." + RESET)
+            return
+
+        print(GREEN + "\n[+] Seu IP público:" + RESET)
+        show_result(ip, data)
+
+    elif choice == "3":
+        ip_local = get_local_ip()
+
+        if not ip_local:
+            print(RED + "[!] Não foi possível obter IP local" + RESET)
+            return
+
+        print(GREEN + "\n[+] Seu IP local:" + RESET)
+        print(CYAN + f"{ip_local}" + RESET)
+
+    else:
+        print(RED + "\n[!] Opção inválida" + RESET)
 
 if __name__ == "__main__":
     main()
