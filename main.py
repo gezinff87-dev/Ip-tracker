@@ -87,6 +87,8 @@ def show_result(ip, data):
         maps_link = f"https://www.google.com/maps?q={lat},{lon}"
         print(YELLOW + f"\n[+] Localização: {lat}, {lon}" + RESET)
         print(GREEN + f"[+] Mapa: {maps_link}" + RESET)
+    else:
+        print(RED + "[!] Sem localização" + RESET)
 
 def open_vpn():
     global ip_antes
@@ -130,7 +132,8 @@ def main():
         print("[2] Consultar IP")
         print("[3] Meu IP (público e local)")
         print("[4] Abrir VPN (Proton VPN)")
-        print("[5] Verificar mudança de IP\n" + RESET)
+        print("[5] Verificar mudança de IP")
+        print("[6] Sair\n" + RESET)
 
         choice = input("Escolha: ")
 
@@ -176,6 +179,19 @@ def main():
 
         elif choice == "5":
             check_vpn()
+
+        elif choice == "6":
+            confirm = input(YELLOW + "\nTem certeza que deseja sair? (s/n): " + RESET).lower()
+
+            if confirm == "s":
+                print(YELLOW + "\n[~] Finalizando..." + RESET)
+                time.sleep(0.5)
+                print(GREEN + "[+] Encerrando IP TRACKER..." + RESET)
+                time.sleep(1)
+                break
+            else:
+                print(CYAN + "\n[~] Retornando ao menu..." + RESET)
+                time.sleep(1)
 
         else:
             print(RED + "\n[!] Opção inválida" + RESET)
