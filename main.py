@@ -11,6 +11,8 @@ YELLOW = "\033[93m"
 CYAN = "\033[96m"
 RESET = "\033[0m"
 
+ip_antes = None
+
 def clear():
     os.system("clear")
 
@@ -43,16 +45,16 @@ def resolve_domain(domain):
     except:
         return None
 
-def get_ip_info(ip, proxies=None):
+def get_ip_info(ip):
     try:
-        res = requests.get(f"https://ipinfo.io/{ip}/json", timeout=5, proxies=proxies)
+        res = requests.get(f"https://ipinfo.io/{ip}/json", timeout=5)
         return res.json()
     except:
         return None
 
-def get_my_ip(proxies=None):
+def get_my_ip():
     try:
-        res = requests.get("https://ipinfo.io/json", timeout=5, proxies=proxies)
+        res = requests.get("https://ipinfo.io/json", timeout=5)
         data = res.json()
         return data.get("ip"), data
     except:
@@ -85,27 +87,40 @@ def show_result(ip, data):
         maps_link = f"https://www.google.com/maps?q={lat},{lon}"
         print(YELLOW + f"\n[+] Localização: {lat}, {lon}" + RESET)
         print(GREEN + f"[+] Mapa: {maps_link}" + RESET)
-    else:
-        print(RED + "[!] Sem localização" + RESET)
 
-def use_proxy():
-    proxy = input(CYAN + "\nDigite proxy (ip:porta): " + RESET)
+def open_vpn():
+    global ip_antes
 
-    proxies = {
-        "http": f"http://{proxy}",
-        "https": f"http://{proxy}"
-    }
+    print(YELLOW + "\n[~] Salvando IP atual..." + RESET)
+    ip_antes, _ = get_my_ip()
 
-    loading()
+    print(GREEN + f"[+] IP atual: {ip_antes}" + RESET)
+    print(YELLOW + "\n[~] Abrindo VPN..." + RESET)
 
-    ip, data = get_my_ip(proxies)
+    url = "https://protonvpn.com/download"
+    os.system(f'termux-open-url "{url}"')
 
-    if not ip:
-        print(RED + "[!] Proxy inválido ou não funcionando" + RESET)
+    print(CYAN + "\n[!] Ative a VPN e volte aqui depois." + RESET)
+
+def check_vpn():
+    global ip_antes
+
+    if not ip_antes:
+        print(RED + "\n[!] Use a opção de VPN primeiro!" + RESET)
         return
 
-    print(GREEN + "\n[+] IP via Proxy:" + RESET)
-    show_result(ip, data)
+    loading()
+    ip_depois, data = get_my_ip()
+
+    print(GREEN + "\n[+] IP atual:" + RESET)
+    show_result(ip_depois, data)
+
+    print(YELLOW + "\n[~] Comparação:" + RESET)
+
+    if ip_depois != ip_antes:
+        print(GREEN + f"[✔] IP mudou: {ip_antes} → {ip_depois}" + RESET)
+    else:
+        print(RED + "[✘] IP NÃO mudou (VPN pode não estar ativa)" + RESET)
 
 def main():
     while True:
@@ -114,7 +129,8 @@ def main():
         print(CYAN + "[1] Consultar URL")
         print("[2] Consultar IP")
         print("[3] Meu IP (público e local)")
-        print("[4] Usar Proxy\n" + RESET)
+        print("[4] Abrir VPN (Proton VPN)")
+        print("[5] Verificar mudança de IP\n" + RESET)
 
         choice = input("Escolha: ")
 
@@ -130,12 +146,6 @@ def main():
 
             loading()
             data = get_ip_info(ip)
-
-            if not data:
-                print(RED + "[!] Erro na API." + RESET)
-                input("\nEnter...")
-                continue
-
             show_result(ip, data)
 
         elif choice == "2":
@@ -148,32 +158,24 @@ def main():
 
             loading()
             data = get_ip_info(ip)
-
-            if not data:
-                print(RED + "[!] Erro na API." + RESET)
-                input("\nEnter...")
-                continue
-
             show_result(ip, data)
 
         elif choice == "3":
             loading()
-
             ip_pub, data = get_my_ip()
             ip_local = get_local_ip()
 
-            if ip_pub:
-                print(GREEN + "\n[+] IP Público:" + RESET)
-                show_result(ip_pub, data)
-            else:
-                print(RED + "[!] Erro IP público" + RESET)
+            print(GREEN + "\n[+] IP Público:" + RESET)
+            show_result(ip_pub, data)
 
-            if ip_local:
-                print(GREEN + "\n[+] IP Local:" + RESET)
-                print(CYAN + ip_local + RESET)
+            print(GREEN + "\n[+] IP Local:" + RESET)
+            print(CYAN + str(ip_local) + RESET)
 
         elif choice == "4":
-            use_proxy()
+            open_vpn()
+
+        elif choice == "5":
+            check_vpn()
 
         else:
             print(RED + "\n[!] Opção inválida" + RESET)
