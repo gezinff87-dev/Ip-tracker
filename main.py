@@ -148,7 +148,7 @@ def main():
         print(CYAN + "[1] Consultar URL")
         print("[2] Consultar IP")
         print("[3] Ver Meu IP (público e local)")
-        print("[4] Abrir VPN (Proton VPN)")
+        print("[4] Ativar VPN (VPN Free)")
         print("[5] Verificar mudança de IP")
         print("[6] Sair/exit\n" + RESET)
 
