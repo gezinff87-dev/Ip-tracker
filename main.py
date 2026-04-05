@@ -106,14 +106,30 @@ def show_result(ip, data):
     else:
         print(RED + "[!] Sem localização" + RESET)
 
-# NOVA FUNÇÃO UNIVERSAL DE ABRIR URL
+# FUNÇÃO UNIVERSAL PARA ABRIR URL (Termux, WSL, Windows, Linux, macOS)
 def open_url(url):
     try:
-        # Tenta abrir pelo webbrowser (mais universal)
-        webbrowser.open(url)
-        print(CYAN + "\n[+] Abrindo no navegador padrão..." + RESET)
+        sistema = platform.system()
+        release = platform.release().lower()
+
+        # Detecta WSL
+        if sistema == "Linux" and "microsoft" in release:
+            os.system(f'explorer.exe "{url}"')
+        # Detecta Termux
+        elif "ANDROID_ROOT" in os.environ:
+            os.system(f'termux-open-url "{url}"')
+        elif sistema == "Linux":
+            os.system(f'xdg-open "{url}"')
+        elif sistema == "Windows":
+            os.system(f'start "" "{url}"')
+        elif sistema == "Darwin":
+            os.system(f'open "{url}"')
+        else:
+            webbrowser.open(url)
+
+        print(CYAN + "\n[+] Abrindo no navegador..." + RESET)
     except Exception as e:
-        print(RED + f"\n[!] Erro ao abrir link: {e}" + RESET)
+        print(RED + f"\n[!] Falha ao abrir link: {e}" + RESET)
 
 def open_vpn():
     global ip_antes
