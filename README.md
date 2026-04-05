@@ -12,6 +12,7 @@ Este projeto foi desenvolvido para funcionar em **Termux, Linux, macOS e Windows
 ✔️ Consultar IP específico  
 ✔️ Exibir seu IP público + IP local  
 ✔️ VPN FREE para instalar
+
 ✔️ Verificar se o IP mudou após ativar VPN   
 
 
