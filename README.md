@@ -35,3 +35,4 @@ Clone o repositório:
 ```bash
 git clone https://github.com/gezinff87-dev/Ip-tracker.git
 cd Ip-tracker
+python3 main.py
