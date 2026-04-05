@@ -1,13 +1,37 @@
-# IP Tracker 🥷
+# 🕵️ IP Tracker
 
-Ferramenta avançada para analisar IPs e domínios direto no Terminal ou PC.
+Uma ferramenta avançada e universal feita em **Python** para analisar IPs e domínios, ver localização aproximada, exibir IP público e IP local, e testar mudança de IP usando VPN.
 
-## 📦 Instalação (Termux)
+Este projeto foi desenvolvido para funcionar em **Termux, Linux, macOS e Windows**, desde que o sistema possua **Python 3** e a biblioteca `requests`.
+
+---
+
+## 🚀 Funcionalidades
+
+✔️ Consultar domínio / URL e ver IP  
+✔️ Consultar IP específico  
+✔️ Exibir seu IP público + IP local  
+✔️ Abrir link para instalar Proton VPN  
+✔️ Verificar se o IP mudou após ativar VPN  
+✔️ Mini “emoji hacker” em ASCII no topo do menu  
+
+---
+
+## 💻 Como usar
+
+### 🔹 Pré‑requisitos
+
+Antes de tudo, certifique‑se de ter:
+
+- Python 3 instalado  
+- Biblioteca `requests`
+
+---
+
+### 📌 Instalação (qualquer sistema)
+
+Clone o repositório:
 
 ```bash
-pkg update && pkg upgrade -y
-pkg install python git -y
 git clone https://github.com/gezinff87-dev/Ip-tracker.git
-cd ip-analyzer
-pip install -r requirements.txt
-python main.py# Ip-tracker
+cd Ip-tracker
