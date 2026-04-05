@@ -43,16 +43,16 @@ def resolve_domain(domain):
     except:
         return None
 
-def get_ip_info(ip):
+def get_ip_info(ip, proxies=None):
     try:
-        res = requests.get(f"https://ipinfo.io/{ip}/json", timeout=5)
+        res = requests.get(f"https://ipinfo.io/{ip}/json", timeout=5, proxies=proxies)
         return res.json()
     except:
         return None
 
-def get_my_ip():
+def get_my_ip(proxies=None):
     try:
-        res = requests.get("https://ipinfo.io/json", timeout=5)
+        res = requests.get("https://ipinfo.io/json", timeout=5, proxies=proxies)
         data = res.json()
         return data.get("ip"), data
     except:
@@ -88,17 +88,36 @@ def show_result(ip, data):
     else:
         print(RED + "[!] Sem localização" + RESET)
 
+def use_proxy():
+    proxy = input(CYAN + "\nDigite proxy (ip:porta): " + RESET)
+
+    proxies = {
+        "http": f"http://{proxy}",
+        "https": f"http://{proxy}"
+    }
+
+    loading()
+
+    ip, data = get_my_ip(proxies)
+
+    if not ip:
+        print(RED + "[!] Proxy inválido ou não funcionando" + RESET)
+        return
+
+    print(GREEN + "\n[+] IP via Proxy:" + RESET)
+    show_result(ip, data)
+
 def main():
     while True:
         banner()
 
         print(CYAN + "[1] Consultar URL")
         print("[2] Consultar IP")
-        print("[3] Meu IP (público e local)\n" + RESET)
+        print("[3] Meu IP (público e local)")
+        print("[4] Usar Proxy\n" + RESET)
 
         choice = input("Escolha: ")
 
-        # CONSULTAR URL
         if choice == "1":
             user_input = input(CYAN + "\nDigite a URL: " + RESET)
             user_input = clean_input(user_input)
@@ -119,7 +138,6 @@ def main():
 
             show_result(ip, data)
 
-        # CONSULTAR IP
         elif choice == "2":
             ip = input(CYAN + "\nDigite o IP: " + RESET).strip()
 
@@ -138,7 +156,6 @@ def main():
 
             show_result(ip, data)
 
-        # MEU IP
         elif choice == "3":
             loading()
 
@@ -149,13 +166,14 @@ def main():
                 print(GREEN + "\n[+] IP Público:" + RESET)
                 show_result(ip_pub, data)
             else:
-                print(RED + "[!] Erro ao obter IP público" + RESET)
+                print(RED + "[!] Erro IP público" + RESET)
 
             if ip_local:
                 print(GREEN + "\n[+] IP Local:" + RESET)
                 print(CYAN + ip_local + RESET)
-            else:
-                print(RED + "[!] Erro ao obter IP local" + RESET)
+
+        elif choice == "4":
+            use_proxy()
 
         else:
             print(RED + "\n[!] Opção inválida" + RESET)
