@@ -3,6 +3,8 @@ import socket
 import re
 import os
 import time
+import platform
+import webbrowser
 
 # CORES
 RED = "\033[91m"
@@ -14,10 +16,9 @@ RESET = "\033[0m"
 ip_antes = None
 
 def clear():
-    os.system("clear")
+    os.system("clear" if platform.system() != "Windows" else "cls")
 
 def anonymous_ascii():
-    # Boneco anônimo no topo do menu, sem cortar
     print("""⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣷⣤⣤⣾⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⣿⣿⣿⣿⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -105,6 +106,15 @@ def show_result(ip, data):
     else:
         print(RED + "[!] Sem localização" + RESET)
 
+# NOVA FUNÇÃO UNIVERSAL DE ABRIR URL
+def open_url(url):
+    try:
+        # Tenta abrir pelo webbrowser (mais universal)
+        webbrowser.open(url)
+        print(CYAN + "\n[+] Abrindo no navegador padrão..." + RESET)
+    except Exception as e:
+        print(RED + f"\n[!] Erro ao abrir link: {e}" + RESET)
+
 def open_vpn():
     global ip_antes
 
@@ -115,7 +125,7 @@ def open_vpn():
     print(YELLOW + "\n[~] Abrindo VPN..." + RESET)
 
     url = "https://protonvpn.com/download"
-    os.system(f'termux-open-url "{url}"')
+    open_url(url)
 
     print(CYAN + "\n[!] Ative a VPN e volte aqui depois." + RESET)
 
@@ -148,9 +158,9 @@ def main():
         print(CYAN + "[1] Consultar URL")
         print("[2] Consultar IP")
         print("[3] Ver Meu IP (público e local)")
-        print("[4] Ativar VPN (VPN Free)")
+        print("[4] Abrir VPN (Proton VPN)")
         print("[5] Verificar mudança de IP")
-        print("[6] Sair/Exit\n" + RESET)
+        print("[6] Sair/exit\n" + RESET)
 
         choice = input("Escolha: ")
 
