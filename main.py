@@ -1,7 +1,6 @@
 import requests
 import socket
 import re
-import sys
 import os
 import time
 
@@ -84,64 +83,84 @@ def show_result(ip, data):
     if loc:
         lat, lon = loc.split(",")
         maps_link = f"https://www.google.com/maps?q={lat},{lon}"
-        print(YELLOW + f"\n[+] Localização aproximada: {lat}, {lon}" + RESET)
+        print(YELLOW + f"\n[+] Localização: {lat}, {lon}" + RESET)
         print(GREEN + f"[+] Mapa: {maps_link}" + RESET)
     else:
-        print(RED + "[!] Localização não disponível" + RESET)
+        print(RED + "[!] Sem localização" + RESET)
 
 def main():
-    banner()
+    while True:
+        banner()
 
-    print(CYAN + "[1] Consultar IP / Domínio")
-    print("[2] Meu IP público")
-    print("[3] Meu IP local\n" + RESET)
+        print(CYAN + "[1] Consultar URL")
+        print("[2] Consultar IP")
+        print("[3] Meu IP (público e local)\n" + RESET)
 
-    choice = input("Escolha: ")
+        choice = input("Escolha: ")
 
-    if choice == "1":
-        user_input = input(CYAN + "\nDigite IP ou domínio: " + RESET)
-        user_input = clean_input(user_input)
+        # CONSULTAR URL
+        if choice == "1":
+            user_input = input(CYAN + "\nDigite a URL: " + RESET)
+            user_input = clean_input(user_input)
 
-        if is_ip(user_input):
-            ip = user_input
-        else:
             ip = resolve_domain(user_input)
             if not ip:
-                print(RED + "\n[!] Domínio inválido." + RESET)
-                return
+                print(RED + "\n[!] URL inválida." + RESET)
+                input("\nEnter...")
+                continue
 
-        loading()
-        data = get_ip_info(ip)
+            loading()
+            data = get_ip_info(ip)
 
-        if not data:
-            print(RED + "[!] Erro na API." + RESET)
-            return
+            if not data:
+                print(RED + "[!] Erro na API." + RESET)
+                input("\nEnter...")
+                continue
 
-        show_result(ip, data)
+            show_result(ip, data)
 
-    elif choice == "2":
-        loading()
-        ip, data = get_my_ip()
+        # CONSULTAR IP
+        elif choice == "2":
+            ip = input(CYAN + "\nDigite o IP: " + RESET).strip()
 
-        if not ip:
-            print(RED + "[!] Não foi possível obter IP." + RESET)
-            return
+            if not is_ip(ip):
+                print(RED + "\n[!] IP inválido." + RESET)
+                input("\nEnter...")
+                continue
 
-        print(GREEN + "\n[+] Seu IP público:" + RESET)
-        show_result(ip, data)
+            loading()
+            data = get_ip_info(ip)
 
-    elif choice == "3":
-        ip_local = get_local_ip()
+            if not data:
+                print(RED + "[!] Erro na API." + RESET)
+                input("\nEnter...")
+                continue
 
-        if not ip_local:
-            print(RED + "[!] Não foi possível obter IP local" + RESET)
-            return
+            show_result(ip, data)
 
-        print(GREEN + "\n[+] Seu IP local:" + RESET)
-        print(CYAN + f"{ip_local}" + RESET)
+        # MEU IP
+        elif choice == "3":
+            loading()
 
-    else:
-        print(RED + "\n[!] Opção inválida" + RESET)
+            ip_pub, data = get_my_ip()
+            ip_local = get_local_ip()
+
+            if ip_pub:
+                print(GREEN + "\n[+] IP Público:" + RESET)
+                show_result(ip_pub, data)
+            else:
+                print(RED + "[!] Erro ao obter IP público" + RESET)
+
+            if ip_local:
+                print(GREEN + "\n[+] IP Local:" + RESET)
+                print(CYAN + ip_local + RESET)
+            else:
+                print(RED + "[!] Erro ao obter IP local" + RESET)
+
+        else:
+            print(RED + "\n[!] Opção inválida" + RESET)
+
+        input("\nPressione Enter para continuar...")
 
 if __name__ == "__main__":
     main()
