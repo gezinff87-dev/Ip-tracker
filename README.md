@@ -1,4 +1,4 @@
-# 🕵️ IP Tracker
+# 🤖 IP Tracker
 
 Uma ferramenta avançada e universal feita em **Python** para analisar IPs e domínios, ver localização aproximada, exibir IP público e IP local, e testar mudança de IP usando VPN.
 
